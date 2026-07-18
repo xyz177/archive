@@ -11,8 +11,10 @@
           mv WGold.plist wgold/Library/MobileSubstrate/DynamicLibraries/
 
           
-
+       
           # Creazione del file control di DEBIAN
+          - name: Create control file
+            run: |
           cat > wgold/DEBIAN/control <<EOF
           Package: com.wgold
           Name: WGold
