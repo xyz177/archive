@@ -9,42 +9,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Build WGold 2.1 package
         run: |
+          set -e
           mkdir -p wgold/DEBIAN
           mkdir -p wgold/Library/MobileSubstrate/DynamicLibraries
           mkdir -p "wgold/Library/Application Support"
 
+          # unzip assets
           unzip -q WGold.bundle.zip
           rm WGold.bundle.zip
 
+          # move files into package
           mv WGold.dylib wgold/Library/MobileSubstrate/DynamicLibraries/
-          mv WGold.bundle "wgold/Library/Application Support/"
           mv WGold.plist wgold/Library/MobileSubstrate/DynamicLibraries/
+          mv WGold.bundle "wgold/Library/Application Support/"
 
-          
-       
-          # Creazione del file control di DEBIAN
-      - name: Create control file
-        run: |
+          # create control file
           cat > wgold/DEBIAN/control <<EOF
           Package: com.wgold
           Name: WGold
-          Depends: mobilesubstrate
           Version: 2.1
           Architecture: iphoneos-arm
-          Description: WGold
+          Description: WGold tweak
           Maintainer: joe
           Author: joe
           Section: Tweaks
-          SileoDepiction: https://apt.fouadraheb.com/package/com.fouadraheb.watusi3
+          Depends: mobilesubstrate
+          SileoDepiction: https://apt.fouadraheb.com/package/com.wgold
+          EOF
 
+          # build deb
           dpkg-deb --build wgold wgold.deb
-          
-          test -f wgold/Library/MobileSubstrate/DynamicLibraries/YTLite.dylib
-          test -f wgold/Library/MobileSubstrate/DynamicLibraries/YTLite.plist
-          test -d "wgold/Library/Application Support/YTLite.bundle"
+          ls -la wgold.deb
+
       - name: Upload deb artifact
         uses: actions/upload-artifact@v4
         with:
