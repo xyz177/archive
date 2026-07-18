@@ -1,0 +1,141 @@
+name: Build Tweak - Universal
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Tweak
+        run: |
+          # your build command here
+          # example: make package
+
+      # ========== ROOTFUL - DYLIB ONLY - arm ==========
+      - name: Create Rootful Dylib structure
+        run: |
+          mkdir -p rootful-dylib/DEBIAN
+          mkdir -p rootful-dylib/Library/MobileSubstrate/DynamicLibraries
+
+      - name: Copy files Rootful Dylib
+        run: |
+          cp Example.dylib rootful-dylib/Library/MobileSubstrate/DynamicLibraries/
+          cp Example.plist rootful-dylib/Library/MobileSubstrate/DynamicLibraries/
+
+      - name: Create control Rootful Dylib
+        run: |
+          cat > rootful-dylib/DEBIAN/control << EOF
+          Package: com.example.tweak
+          Name: Example
+          Version: 1.0.0
+          Architecture: iphoneos-arm
+          Description: Example tweak
+          Maintainer: Example
+          Author: Example
+          Section: Tweaks
+          Depends: mobilesubstrate
+          EOF
+
+      - name: Build Rootful Dylib DEB
+        run: dpkg-deb -b rootful-dylib Example_1.0.0_iphoneos-arm.deb
+
+      # ========== ROOTFUL - BUNDLE - arm ==========
+      - name: Create Rootful Bundle structure
+        run: |
+          mkdir -p rootful-bundle/DEBIAN
+          mkdir -p rootful-bundle/Library/Application\ Support/Example
+          mkdir -p rootful-bundle/Library/MobileSubstrate/DynamicLibraries
+
+      - name: Copy files Rootful Bundle
+        run: |
+          cp -r Example.bundle rootful-bundle/Library/Application\ Support/Example/
+          cp Example.dylib rootful-bundle/Library/MobileSubstrate/DynamicLibraries/
+          cp Example.plist rootful-bundle/Library/MobileSubstrate/DynamicLibraries/
+
+      - name: Create control Rootful Bundle
+        run: |
+          cat > rootful-bundle/DEBIAN/control << EOF
+          Package: com.example.tweak.bundle
+          Name: Example Bundle
+          Version: 1.0.0
+          Architecture: iphoneos-arm
+          Description: Example tweak with resources
+          Maintainer: Example
+          Author: Example
+          Section: Tweaks
+          Depends: mobilesubstrate
+          EOF
+
+      - name: Build Rootful Bundle DEB
+        run: dpkg-deb -b rootful-bundle Example_1.0.0_bundle_iphoneos-arm.deb
+
+      # ========== ROOTLESS - DYLIB ONLY - arm64 ==========
+      - name: Create Rootless Dylib structure
+        run: |
+          mkdir -p rootless-dylib/DEBIAN
+          mkdir -p rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries
+
+      - name: Copy files Rootless Dylib
+        run: |
+          cp Example.dylib rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries/
+          cp Example.plist rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries/
+
+      - name: Create control Rootless Dylib
+        run: |
+          cat > rootless-dylib/DEBIAN/control << EOF
+          Package: com.example.tweak.rootless
+          Name: Example (Rootless)
+          Version: 1.0.0
+          Architecture: iphoneos-arm64
+          Description: Example tweak - Rootless
+          Maintainer: Example
+          Author: Example
+          Section: Tweaks
+          Depends: mobilesubstrate
+          EOF
+
+      - name: Build Rootless Dylib DEB
+        run: dpkg-deb -b rootless-dylib Example_1.0.0_rootless_iphoneos-arm64.deb
+
+      # ========== ROOTLESS - BUNDLE - arm64 ==========
+      - name: Create Rootless Bundle structure
+        run: |
+          mkdir -p rootless-bundle/DEBIAN
+          mkdir -p rootless-bundle/var/jb/Library/Application\ Support/Example
+          mkdir -p rootless-bundle/var/jb/Library/MobileSubstrate/DynamicLibraries
+
+      - name: Copy files Rootless Bundle
+        run: |
+          cp -r Example.bundle rootless-bundle/var/jb/Library/Application\ Support/Example/
+          cp Example.dylib rootless-bundle/var/jb/Library/MobileSubstrate/DynamicLibraries/
+          cp Example.plist rootless-bundle/var/jb/Library/MobileSubstrate/DynamicLibraries/
+
+      - name: Create control Rootless Bundle
+        run: |
+          cat > rootless-bundle/DEBIAN/control << EOF
+          Package: com.example.tweak.bundle.rootless
+          Name: Example Bundle (Rootless)
+          Version: 1.0.0
+          Architecture: iphoneos-arm64
+          Description: Example tweak with resources - Rootless
+          Maintainer: Example
+          Author: Example
+          Section: Tweaks
+          Depends: mobilesubstrate
+          EOF
+
+      - name: Build Rootless Bundle DEB
+        run: dpkg-deb -b rootless-bundle Example_1.0.0_bundle_rootless_iphoneos-arm64.deb
+
+      # ========== UPLOAD ALL 4 ==========
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Example-Universal
+          path: |
+            Example_1.0.0_iphoneos-arm.deb
+            Example_1.0.0_bundle_iphoneos-arm.deb
+            Example_1.0.0_rootless_iphoneos-arm64.deb
+            Example_1.0.0_bundle_rootless_iphoneos-arm64.deb
