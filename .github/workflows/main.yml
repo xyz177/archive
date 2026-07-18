@@ -1,0 +1,31 @@
+
+          mkdir -p ytplus/DEBIAN
+          mkdir -p ytplus/Library/MobileSubstrate/DynamicLibraries
+          mkdir -p ytplus/Library/Application Support
+
+          mv YTLite.dylib ytplus/Library/MobileSubstrate/DynamicLibraries/
+          mv YTLite.bundle ytplus/Library/Application Support/
+          mv YTLite.plist ytplus/Library/MobileSubstrate/DynamicLibraries/
+
+          
+
+          # Creazione del file control di DEBIAN
+          cat > ytplus/DEBIAN/control <<EOF
+          Package: com.dvntm.ytlite
+          Name: YTLite
+          Depends: mobilesubstrate
+          Version: 0.0.1
+          Architecture: iphoneos-arm
+          Description: Lightweight YouTube Enhancer
+          Maintainer: dvntm
+          Author: dvntm
+          Section: Tweaks
+          Icon: https://raw.githubusercontent.com/dayanch96/icons/main/ytlite.png
+          SileoDepiction: https://raw.githubusercontent.com/dayanch96/icons/main/ytlite.json
+          EOF
+
+          dpkg-deb --build ytplus ytplus.deb
+          
+          test -f ytplus/Library/MobileSubstrate/DynamicLibraries/YTLite.dylib
+          test -f ytplus/Library/MobileSubstrate/DynamicLibraries/YTLite.plist
+          test -d "ytplus/Library/Application Support/YTLite.bundle"
