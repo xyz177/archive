@@ -1,14 +1,26 @@
+name: Build WGold
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
       - name: Build WGold 2.1 package
         run: |
           mkdir -p wgold/DEBIAN
           mkdir -p wgold/Library/MobileSubstrate/DynamicLibraries
-          mkdir -p wgold/Library/Application Support
+          mkdir -p "wgold/Library/Application Support"
 
           unzip -q WGold.bundle.zip
           rm WGold.bundle.zip
 
           mv WGold.dylib wgold/Library/MobileSubstrate/DynamicLibraries/
-          mv WGold.bundle wgold/Library/Application Support/
+          mv WGold.bundle "wgold/Library/Application Support/"
           mv WGold.plist wgold/Library/MobileSubstrate/DynamicLibraries/
 
           
