@@ -1,4 +1,5 @@
-
+          - name: Build WGold 2.1 package
+            run: |
           mkdir -p wgold/DEBIAN
           mkdir -p wgold/Library/MobileSubstrate/DynamicLibraries
           mkdir -p wgold/Library/Application Support
