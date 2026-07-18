@@ -1,11 +1,11 @@
 
-          mkdir -p ytplus/DEBIAN
-          mkdir -p ytplus/Library/MobileSubstrate/DynamicLibraries
-          mkdir -p ytplus/Library/Application Support
+          mkdir -p wgold/DEBIAN
+          mkdir -p wgold/Library/MobileSubstrate/DynamicLibraries
+          mkdir -p wgold/Library/Application Support
 
-          mv YTLite.dylib ytplus/Library/MobileSubstrate/DynamicLibraries/
-          mv YTLite.bundle ytplus/Library/Application Support/
-          mv YTLite.plist ytplus/Library/MobileSubstrate/DynamicLibraries/
+          mv WGold.dylib ytplus/Library/MobileSubstrate/DynamicLibraries/
+          mv WGold.bundle ytplus/Library/Application Support/
+          mv WGold.plist ytplus/Library/MobileSubstrate/DynamicLibraries/
 
           
 
