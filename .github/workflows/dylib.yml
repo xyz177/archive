@@ -1,0 +1,47 @@
+name: Build YTDownloadManager DEB
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          # your build command here
+          # example: make package
+
+      - name: Create DEB folder structure
+        run: |
+          mkdir -p package/DEBIAN
+          mkdir -p package/Library/MobileSubstrate/DynamicLibraries
+
+      - name: Copy files
+        run: |
+          cp YTDownloadManager.dylib package/Library/MobileSubstrate/DynamicLibraries/
+          cp YTDownloadManager.plist package/Library/MobileSubstrate/DynamicLibraries/
+
+      - name: Create control file
+        run: |
+          cat > package/DEBIAN/control << EOF
+          Package: com.youtube.ytdownloadmanager
+          Name: YTDownloadManager
+          Version: 1.0.0
+          Architecture: iphoneos-arm
+          Description: Download manager for YouTube
+          Maintainer: YouTube
+          Author: YouTube
+          Section: Tweaks
+          Depends: mobilesubstrate
+          EOF
+
+      - name: Build DEB
+        run: dpkg-deb -b package YTDownloadManager_1.0.0_iphoneos-arm.deb
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YTDownloadManager-DEB
+          path: YTDownloadManager_1.0.0_iphoneos-arm.deb
