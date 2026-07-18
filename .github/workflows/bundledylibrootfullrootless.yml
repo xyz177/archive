@@ -1,4 +1,4 @@
-name: Build Tweak - Universal
+name: Build wgold - 2 DEBs
 on:
   push:
     branches: [ main ]
@@ -14,128 +14,73 @@ jobs:
           # your build command here
           # example: make package
 
-      # ========== ROOTFUL - DYLIB ONLY - arm ==========
-      - name: Create Rootful Dylib structure
+      # ========== UNZIP BUNDLE ==========
+      - name: Unzip bundle
         run: |
-          mkdir -p rootful-dylib/DEBIAN
-          mkdir -p rootful-dylib/Library/MobileSubstrate/DynamicLibraries
+          unzip WGold.bundle.zip -d .
+          # outputs: wgold.bundle/
 
-      - name: Copy files Rootful Dylib
+      # ========== ROOTFUL - arm | dylib + bundle ==========
+      - name: Create Rootful structure
         run: |
-          cp Example.dylib rootful-dylib/Library/MobileSubstrate/DynamicLibraries/
-          cp Example.plist rootful-dylib/Library/MobileSubstrate/DynamicLibraries/
+          mkdir -p wgold-rootful/DEBIAN
+          mkdir -p wgold-rootful/Library/MobileSubstrate/DynamicLibraries
+          mkdir -p wgold-rootful/Library/Application\ Support/wgold
 
-      - name: Create control Rootful Dylib
+      - name: Copy files Rootful
         run: |
-          cat > rootful-dylib/DEBIAN/control << EOF
-          Package: com.example.tweak
-          Name: Example
-          Version: 1.0.0
+          cp WGold.dylib wgold-rootful/Library/MobileSubstrate/DynamicLibraries/
+          cp WGold.plist wgold-rootful/Library/MobileSubstrate/DynamicLibraries/
+          cp -r WGold.bundle wgold-rootful/Library/Application\ Support/wgold/
+
+      - name: Create control Rootful
+        run: |
+          cat > wgold-rootful/DEBIAN/control << EOF
+          Package: com.whatsapp.wgold
+          Name: wgold - rootfull
+          Version: 2.1
           Architecture: iphoneos-arm
-          Description: Example tweak
+          Description: wgold tweak
           Maintainer: Example
-          Author: Example
           Section: Tweaks
           Depends: mobilesubstrate
           EOF
 
-      - name: Build Rootful Dylib DEB
-        run: dpkg-deb -b rootful-dylib Example_1.0.0_iphoneos-arm.deb
+      - name: Build Rootful DEB
+        run: dpkg-deb -b wgold-rootful wgold_2.1_iphoneos-arm.deb
 
-      # ========== ROOTFUL - BUNDLE - arm ==========
-      - name: Create Rootful Bundle structure
+      # ========== ROOTLESS - arm64 | dylib + bundle ==========
+      - name: Create Rootless structure
         run: |
-          mkdir -p rootful-bundle/DEBIAN
-          mkdir -p rootful-bundle/Library/Application\ Support/Example
-          mkdir -p rootful-bundle/Library/MobileSubstrate/DynamicLibraries
+          mkdir -p wgold-rootless/DEBIAN
+          mkdir -p wgold-rootless/var/jb/Library/MobileSubstrate/DynamicLibraries
+          mkdir -p wgold-rootless/var/jb/Library/Application\ Support/wgold
 
-      - name: Copy files Rootful Bundle
+      - name: Copy files Rootless
         run: |
-          cp -r Example.bundle rootful-bundle/Library/Application\ Support/Example/
-          cp Example.dylib rootful-bundle/Library/MobileSubstrate/DynamicLibraries/
-          cp Example.plist rootful-bundle/Library/MobileSubstrate/DynamicLibraries/
+          cp WGold.dylib wgold-rootless/var/jb/Library/MobileSubstrate/DynamicLibraries/
+          cp WGold.plist wgold-rootless/var/jb/Library/MobileSubstrate/DynamicLibraries/
+          cp -r WGold.bundle wgold-rootless/var/jb/Library/Application\ Support/wgold/
 
-      - name: Create control Rootful Bundle
+      - name: Create control Rootless
         run: |
-          cat > rootful-bundle/DEBIAN/control << EOF
-          Package: com.example.tweak.bundle
-          Name: Example Bundle
-          Version: 1.0.0
-          Architecture: iphoneos-arm
-          Description: Example tweak with resources
-          Maintainer: Example
-          Author: Example
-          Section: Tweaks
-          Depends: mobilesubstrate
-          EOF
-
-      - name: Build Rootful Bundle DEB
-        run: dpkg-deb -b rootful-bundle Example_1.0.0_bundle_iphoneos-arm.deb
-
-      # ========== ROOTLESS - DYLIB ONLY - arm64 ==========
-      - name: Create Rootless Dylib structure
-        run: |
-          mkdir -p rootless-dylib/DEBIAN
-          mkdir -p rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries
-
-      - name: Copy files Rootless Dylib
-        run: |
-          cp Example.dylib rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries/
-          cp Example.plist rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries/
-
-      - name: Create control Rootless Dylib
-        run: |
-          cat > rootless-dylib/DEBIAN/control << EOF
-          Package: com.example.tweak.rootless
-          Name: Example (Rootless)
-          Version: 1.0.0
+          cat > wgold-rootless/DEBIAN/control << EOF
+          Package: com.whatsapp.wgold
+          Name: WGold (Rootless)
+          Version: 2.1
           Architecture: iphoneos-arm64
-          Description: Example tweak - Rootless
+          Description: wgold tweak - Rootless
           Maintainer: Example
-          Author: Example
           Section: Tweaks
           Depends: mobilesubstrate
-          EOF
+          
+      - name: Build Rootless DEB
+        run: dpkg-deb -b wgold-rootless wgold_2.1_rootless_iphoneos-arm64.deb
 
-      - name: Build Rootless Dylib DEB
-        run: dpkg-deb -b rootless-dylib Example_1.0.0_rootless_iphoneos-arm64.deb
-
-      # ========== ROOTLESS - BUNDLE - arm64 ==========
-      - name: Create Rootless Bundle structure
-        run: |
-          mkdir -p rootless-bundle/DEBIAN
-          mkdir -p rootless-bundle/var/jb/Library/Application\ Support/Example
-          mkdir -p rootless-bundle/var/jb/Library/MobileSubstrate/DynamicLibraries
-
-      - name: Copy files Rootless Bundle
-        run: |
-          cp -r Example.bundle rootless-bundle/var/jb/Library/Application\ Support/Example/
-          cp Example.dylib rootless-bundle/var/jb/Library/MobileSubstrate/DynamicLibraries/
-          cp Example.plist rootless-bundle/var/jb/Library/MobileSubstrate/DynamicLibraries/
-
-      - name: Create control Rootless Bundle
-        run: |
-          cat > rootless-bundle/DEBIAN/control << EOF
-          Package: com.example.tweak.bundle.rootless
-          Name: Example Bundle (Rootless)
-          Version: 1.0.0
-          Architecture: iphoneos-arm64
-          Description: Example tweak with resources - Rootless
-          Maintainer: Example
-          Author: Example
-          Section: Tweaks
-          Depends: mobilesubstrate
-          EOF
-
-      - name: Build Rootless Bundle DEB
-        run: dpkg-deb -b rootless-bundle Example_1.0.0_bundle_rootless_iphoneos-arm64.deb
-
-      # ========== UPLOAD ALL 4 ==========
+         # ========== UPLOAD 2 DEBS ==========
       - uses: actions/upload-artifact@v4
         with:
-          name: Example-Universal
+          name: wgold-Universal
           path: |
-            Example_1.0.0_iphoneos-arm.deb
-            Example_1.0.0_bundle_iphoneos-arm.deb
-            Example_1.0.0_rootless_iphoneos-arm64.deb
-            Example_1.0.0_bundle_rootless_iphoneos-arm64.deb
+            wgold_2.1_iphoneos-arm.deb
+            wgold_2.1_rootless_iphoneos-arm64.deb
