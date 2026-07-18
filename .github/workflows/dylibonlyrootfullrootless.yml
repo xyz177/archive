@@ -1,0 +1,79 @@
+name: Build Tweak - Dylib Only
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Tweak
+        run: |
+          # your build command here
+          # example: make package
+
+      # ========== ROOTFUL - arm ==========
+      - name: Create Rootful Dylib structure
+        run: |
+          mkdir -p rootful-dylib/DEBIAN
+          mkdir -p rootful-dylib/Library/MobileSubstrate/DynamicLibraries
+
+      - name: Copy files Rootful Dylib
+        run: |
+          cp Example.dylib rootful-dylib/Library/MobileSubstrate/DynamicLibraries/
+          cp Example.plist rootful-dylib/Library/MobileSubstrate/DynamicLibraries/
+
+      - name: Create control Rootful Dylib
+        run: |
+          cat > rootful-dylib/DEBIAN/control << EOF
+          Package: com.example.tweak
+          Name: Example
+          Version: 1.0.0
+          Architecture: iphoneos-arm
+          Description: Example tweak
+          Maintainer: Example
+          Author: Example
+          Section: Tweaks
+          Depends: mobilesubstrate
+          EOF
+
+      - name: Build Rootful Dylib DEB
+        run: dpkg-deb -b rootful-dylib Example_1.0.0_iphoneos-arm.deb
+
+      # ========== ROOTLESS - arm64 ==========
+      - name: Create Rootless Dylib structure
+        run: |
+          mkdir -p rootless-dylib/DEBIAN
+          mkdir -p rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries
+
+      - name: Copy files Rootless Dylib
+        run: |
+          cp Example.dylib rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries/
+          cp Example.plist rootless-dylib/var/jb/Library/MobileSubstrate/DynamicLibraries/
+
+      - name: Create control Rootless Dylib
+        run: |
+          cat > rootless-dylib/DEBIAN/control << EOF
+          Package: com.example.tweak.rootless
+          Name: Example (Rootless)
+          Version: 1.0.0
+          Architecture: iphoneos-arm64
+          Description: Example tweak - Rootless
+          Maintainer: Example
+          Author: Example
+          Section: Tweaks
+          Depends: mobilesubstrate
+          EOF
+
+      - name: Build Rootless Dylib DEB
+        run: dpkg-deb -b rootless-dylib Example_1.0.0_rootless_iphoneos-arm64.deb
+
+      # ========== UPLOAD BOTH ==========
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Example-Dylib-Universal
+          path: |
+            Example_1.0.0_iphoneos-arm.deb
+            Example_1.0.0_rootless_iphoneos-arm64.deb
