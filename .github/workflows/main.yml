@@ -49,4 +49,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WGold-2.1
-          path: wgold_2.1_iphoneos-arm.deb
+          path: wgold.deb
