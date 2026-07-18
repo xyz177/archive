@@ -3,29 +3,30 @@
           mkdir -p wgold/Library/MobileSubstrate/DynamicLibraries
           mkdir -p wgold/Library/Application Support
 
-          mv WGold.dylib ytplus/Library/MobileSubstrate/DynamicLibraries/
-          mv WGold.bundle ytplus/Library/Application Support/
-          mv WGold.plist ytplus/Library/MobileSubstrate/DynamicLibraries/
+          unzip -q WGold.bundle.zip
+          rm WGold.bundle.zip
+
+          mv WGold.dylib wgold/Library/MobileSubstrate/DynamicLibraries/
+          mv WGold.bundle wgold/Library/Application Support/
+          mv WGold.plist wgold/Library/MobileSubstrate/DynamicLibraries/
 
           
 
           # Creazione del file control di DEBIAN
-          cat > ytplus/DEBIAN/control <<EOF
-          Package: com.dvntm.ytlite
-          Name: YTLite
+          cat > wgold/DEBIAN/control <<EOF
+          Package: com.wgold
+          Name: WGold
           Depends: mobilesubstrate
-          Version: 0.0.1
+          Version: 2.1
           Architecture: iphoneos-arm
-          Description: Lightweight YouTube Enhancer
-          Maintainer: dvntm
-          Author: dvntm
+          Description: WGold
+          Maintainer: joe
+          Author: joe
           Section: Tweaks
-          Icon: https://raw.githubusercontent.com/dayanch96/icons/main/ytlite.png
-          SileoDepiction: https://raw.githubusercontent.com/dayanch96/icons/main/ytlite.json
-          EOF
+          SileoDepiction: https://apt.fouadraheb.com/package/com.fouadraheb.watusi3
 
-          dpkg-deb --build ytplus ytplus.deb
+          dpkg-deb --build wgold wgold.deb
           
-          test -f ytplus/Library/MobileSubstrate/DynamicLibraries/YTLite.dylib
-          test -f ytplus/Library/MobileSubstrate/DynamicLibraries/YTLite.plist
-          test -d "ytplus/Library/Application Support/YTLite.bundle"
+          test -f wgold/Library/MobileSubstrate/DynamicLibraries/YTLite.dylib
+          test -f wgold/Library/MobileSubstrate/DynamicLibraries/YTLite.plist
+          test -d "wgold/Library/Application Support/YTLite.bundle"
